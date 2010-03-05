@@ -7,6 +7,7 @@ require_once 'Ak33m/Auth/Adapter/OpenId.php';
 class IndexController extends Zend_Controller_Action
 {
     private $_auth;
+    private $_alcUrl = 'http://www.alc.co.jp/';
 
     public function init()
     {
@@ -20,7 +21,7 @@ class IndexController extends Zend_Controller_Action
             $this->view->records    = $records->getByIdentity($this->_auth->getIdentity());
             $this->view->graph_data = Zend_Json::encode($records->getGraphData($this->_auth->getIdentity()));
             $this->view->count      = count($this->view->records);
-            $this->view->identity   = $this->_auth->getIdentity();
+            $this->view->email      = $this->_auth->getIdentity();
         }
         $this->view->hasIdentity = $this->_auth->hasIdentity();
     }
@@ -28,24 +29,20 @@ class IndexController extends Zend_Controller_Action
     public function sessionAction()
     {
         $sreg = new Ak33m_OpenId_Extension_Ax(
-            array('email' => true),
-            null,
-            1.1
+            array('email' => true)
         );
 
-        // When request comes from Identity Provider,
-        // the request doesn't have params.
-        if ($this->_hasParam('openid_identifier')) {
-            $openidIdentifier = $this->_request->getParam('openid_identifier');
-        }
-        if ((!is_null($openidIdentifier)) || $this->_request->getParam('openid_mode')) {
+        $openidIdentifier = $this->_request->getParam('openid_identifier');
+        if (!is_null($openidIdentifier) || $this->_request->getParam('openid_mode')) {
             $result = $this->_auth->authenticate(
-                new Ak33m_Auth_Adapter_OpenId($openidIdentifier, null, null, null, $sreg));
-            if (!$result->isValid()) {
+                new Ak33m_Auth_Adapter_OpenId($openidIdentifier, null, null, null, $sreg)
+            );
+            if ($result->isValid()) {
+                $data = $sreg->getProperties();
+                // email を identity にする
+                Zend_Auth::getInstance()->getStorage()->write($data['email']);
+            } else {
                 $this->_auth->clearIdentity();
-                foreach ($result->getMessages() as $message) {
-                    $status .= "$message<br>\n";
-                }
             }
         }
         $this->_redirect('/');
@@ -56,19 +53,7 @@ class IndexController extends Zend_Controller_Action
         if ($this->_auth->hasIdentity()) {
             $this->_auth->clearIdentity();
         }
-        $this->_redirect($this->_logoutTo);
-    }
-
-    public function testAction()
-    {
-            //$users = new Users();
-            //$a = $users->getByIdentity('aadfasd');
-            //var_dump($a);
-            //exit;
-        //} else
-        //echo 'bb';
-        //exit;
-
+        $this->_redirect('/');
     }
 }
 

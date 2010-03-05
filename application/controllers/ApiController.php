@@ -11,12 +11,12 @@ class ApiController extends Zend_Controller_Action
 
     public function sessionAction()
     {
-        $response = $this->getResponse();
         if ($this->_auth->hasIdentity()) {
-            $response->setHeader('Status', '200');
+            $this->getResponse()->setHttpResponseCode(200);
         } else {
-            $response->setHeader('Status', '404');
+            $this->getResponse()->setHttpResponseCode(404);
         }
+        $this->getResponse()->sendResponse();
         exit;
     }
 

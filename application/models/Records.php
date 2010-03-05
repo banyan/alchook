@@ -60,16 +60,16 @@ class Application_Model_Records extends Application_Model_Abstract
     }
 
     /**
-     * Create records
+     * Create record
      *
      * @param  string $query
-     * @param  string $auth
+     * @param  string $identity
      * @return void
      */
-    public function create($query, $auth)
+    public function create($query, $identity)
     {
         $doc = array(
-           "identity"   => $auth,
+           "identity"   => $identity,
            "query"      => rawurldecode($query),
            "created_at" => time(),
         );
