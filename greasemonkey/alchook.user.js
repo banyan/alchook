@@ -3,11 +3,11 @@
 // @namespace http://d.hatena.ne.jp/bannyan/
 // @include   http://www.alc.co.jp/*
 // @include   http://eow.alc.co.jp/*/UTF-8/*
-//
-// @require http://zend.mi.nu/js/jquery-1.3.2.min.js
-//
-// @resource normal http://zend.mi.nu/images/alchook.png
-// @resource on     http://zend.mi.nu/images/alchook_on.png
+
+// @require http://alchook.mi.nu/js/jquery-1.3.2.min.js
+
+// @resource normal http://alchook.mi.nu/images/alchook.png
+// @resource on     http://alchook.mi.nu/images/alchook_on.png
 
 // ==/UserScript==
 
@@ -25,21 +25,23 @@ GM_addStyle(<><![CDATA[
 
 (function(w) {
 
+	const ALKHOOK_URL = 'http://alchook.mi.nu/';
+
 	var AlcHook = {};
 	AlcHook = {
 
 		init: function() {
 			this.checkAuthenticated();
-			this.setStyle();
+			this.addStyle();
 			this.isExecutable();
 			this.postData();
 		},
 
-		setStyle: function() {
+		addStyle: function() {
 	        w.document.body.appendChild(
                 update(document.createElement('div'), {
                     'style': "background: url(" + GM_getResourceURL('normal') + ")",
-                    'id'  : 'alchook'
+                    'id'   : 'alchook'
                 })	
             );
 
@@ -47,23 +49,21 @@ GM_addStyle(<><![CDATA[
             	$(this).css('background', "url(" + GM_getResourceURL('on') + ")");
             }).mouseout(function() {
             	$(this).css('background', "url(" + GM_getResourceURL('normal') + ")");
-           	}).wrap('<a href="http://zend.mi.nu/"> target="_blank"');
+           	}).wrap('<a href="' + ALKHOOK_URL + '"> target="_blank"');
 
-           	$
 	    },
 
 		// TODO cache の実装を考える
 		checkAuthenticated: function() {
 		    GM_xmlhttpRequest({
 		        method : 'GET',
-		        url : 'http://zend.mi.nu/api/check/',
+		        url : ALKHOOK_URL + 'api/session/',
 		        onload : this.bind(this, function(response) {
-					if (response.responseText === 'OK') {
-						console.log(response.responseText);
+		        	console.log(response.status);
+					if (response.status === 200) {
 						return;
 					} else {
-						console.log(response.responseText);
-						location.href = 'http://zend.mi.nu/index/session/';
+						location.href = ALKHOOK_URL;
 						return;
 					}
 		        })
@@ -79,7 +79,7 @@ GM_addStyle(<><![CDATA[
 			if (!search) return;
 		    GM_xmlhttpRequest({
 		        method : 'POST',
-		        url : 'http://zend.mi.nu/api/create/',
+		        url : ALKHOOK_URL + 'api/create/',
 				data: "query=" + encodeURIComponent(search),
 				headers: {
 					"Content-Type": "application/x-www-form-urlencoded"

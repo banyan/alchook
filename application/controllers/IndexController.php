@@ -58,5 +58,17 @@ class IndexController extends Zend_Controller_Action
         }
         $this->_redirect($this->_logoutTo);
     }
+
+    public function testAction()
+    {
+            //$users = new Users();
+            //$a = $users->getByIdentity('aadfasd');
+            //var_dump($a);
+            //exit;
+        //} else
+        //echo 'bb';
+        //exit;
+
+    }
 }
 

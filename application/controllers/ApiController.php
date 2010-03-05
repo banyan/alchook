@@ -9,12 +9,13 @@ class ApiController extends Zend_Controller_Action
         $this->_auth = Zend_Auth::getInstance();
     }
 
-    public function checkAction()
+    public function sessionAction()
     {
+        $response = $this->getResponse();
         if ($this->_auth->hasIdentity()) {
-            echo 'OK';
+            $response->setHeader('Status', '200');
         } else {
-            echo 'NG';
+            $response->setHeader('Status', '404');
         }
         exit;
     }
